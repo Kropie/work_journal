@@ -35,7 +35,16 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
+  fonts:
+  - family: Pacifico
+    fonts:
+      - asset: assets/fonts/Pacifico/Pacifico-Regular.ttf
+  - family: AbrilFatface
+    fonts:
+      - asset: assets/fonts/Abril_Fatface/AbrilFatface-Regular.ttf
+  - family: Playfair
+    fonts:
+      - asset: assets/fonts/Playfair/PlayfairDisplaySC-Bold.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

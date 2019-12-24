@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:work_journal/models/work_event.dart';
 import 'package:work_journal/screens/work_event_screen.dart';
 
 class HomeScreenState extends State<HomeScreen> {
   final _events = <WorkEvent>[];
+  static const _TITLE = "Work Journal";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).backgroundColor,
+      // Abb bar start.
       appBar: AppBar(
         centerTitle: true,
+        leading: Icon(
+          Icons.book,
+          color: Colors.white,
+        ),
         title: Text(
-          "Work Journal",
+          _TITLE,
           style: Theme.of(context).textTheme.headline,
         ),
       ),
-      body: _buildEventWidgets(),
+      body: WorkEventScreen(_events),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addEvent(context),
         child: Icon(Icons.add),
@@ -24,50 +30,10 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildEventWidgets() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: _buildEventRow,
-      itemCount: _events.length,
-    );
-  }
-
-  Widget _buildEventRow(BuildContext context, int i) {
-    final evt = _events[i];
-
-    var respondToTap = () => _openEventScreen(context, _events[i]);
-
-    return ListTile(
-      title: Column(
-        children: <Widget>[
-          Text(evt.name),
-          Text(
-            new DateFormat.yMd().format(evt.entryDate),
-            style: Theme.of(context).textTheme.body2,
-          )
-        ],
-        crossAxisAlignment: CrossAxisAlignment.start,
-      ),
-      leading: Icon(
-        Icons.star,
-        color: Colors.blue,
-      ),
-      onTap: respondToTap,
-    );
-  }
-
-  void _addEvent(BuildContext context) {
+  _addEvent(BuildContext context) {
     setState(() {
-      final evt = WorkEvent(
-          "", WorkEventType.accomplishment, DateTime.now());
-      _events.add(evt);
-      _openEventScreen(context, evt);
+      _events.add(WorkEvent("", WorkEventType.accomplishment, DateTime.now()));
     });
-  }
-
-  void _openEventScreen(BuildContext context, WorkEvent event) {
-    Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (BuildContext context) => WorkEventScreen(event)));
   }
 }
 

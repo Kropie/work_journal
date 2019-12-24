@@ -1,18 +1,20 @@
-class WorkEvent {
+import 'package:work_journal/models/removable.dart';
+import 'package:work_journal/models/tag.dart';
+
+class WorkEvent extends TaggedRemovable {
   String name;
   String description;
   WorkEventType eventType;
-  List<WorkSkills> workSkills;
+  List<Tag<WorkEvent>> workSkills;
   DateTime entryDate;
 
   WorkEvent(this.name, this.eventType, this.entryDate,
       {this.description = '', this.workSkills = const []});
+
+  @override
+  void remove(Tag tag) {
+    workSkills.remove(tag);
+  }
 }
 
-class WorkSkills {
-  String name;
-
-  WorkSkills(this.name);
-}
-
-enum WorkEventType { accomplishment, journalEntry, milestone }
+enum WorkEventType { accomplishment, journalEntry }

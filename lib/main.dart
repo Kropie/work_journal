@@ -11,17 +11,21 @@ class MyApp extends StatelessWidget {
       title: 'Work Journal',
       home: HomeScreen(),
       theme: ThemeData(
-          brightness: Brightness.light,
-          primaryColor: Colors.blue,
-          accentColor: Colors.blueAccent,
+          backgroundColor: Colors.black,
+          brightness: Brightness.dark,
+          primaryColor: Colors.red,
+          accentColor: Colors.redAccent,
+          cardColor: Color.fromARGB(255, 25, 25, 25),
           fontFamily: 'Georgia',
           textTheme: TextTheme(
-            headline: TextStyle(fontSize: 36.0, color: Colors.white),
+            headline: TextStyle(
+                fontFamily: 'Playfair', fontSize: 36.0, color: Colors.white),
             title: TextStyle(fontSize: 18.0, color: Colors.white),
-            body1: TextStyle(
-              fontSize: 14.0,
-            ),
-            body2: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
+            body1: TextStyle(fontSize: 14.0, color: Colors.white),
+            body2: TextStyle(
+                fontSize: 12.0,
+                fontStyle: FontStyle.italic,
+                color: Colors.white),
           )),
     );
   }

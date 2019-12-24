@@ -1,59 +1,114 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:work_journal/models/work_event.dart';
+import 'package:work_journal/screens/components/tag_widget.dart';
 
 class WorkEventScreenState extends State<WorkEventScreen> {
-  WorkEvent workEvent;
+  List<WorkEvent> workEvents;
+  List<bool> _expansionStateList;
 
-  WorkEventScreenState({this.workEvent});
+  WorkEventScreenState({this.workEvents}) {
+    if (workEvents.isEmpty) {
+      _expansionStateList = [false];
+    } else {
+      _expansionStateList = workEvents.map((event) => false).toList();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController nameController = TextEditingController();
-    nameController.text = workEvent.name;
-    TextField nameWidget = TextField(
-      keyboardType: TextInputType.multiline,
-        decoration: InputDecoration(
-            border: InputBorder.none, hintText: "Please provide name"),
-        style: Theme.of(context).textTheme.title,
-        maxLines: null,
-        controller: nameController,
-        onChanged: (newValue) => workEvent.name = newValue);
+    List<ExpansionPanel> childPanels = [];
+    for (var i = 0; i < workEvents.length; i++) {
+      childPanels.add(ExpansionPanel(
+          headerBuilder: (BuildContext context, bool isExpanded) =>
+              _buildHeader(context, _isExpanded(i), workEvents[i]),
+          body: _buildBody(context, workEvents[i]),
+          isExpanded: _isExpanded(i)));
+    }
 
-    TextEditingController descriptionController = TextEditingController();
-    descriptionController.text = workEvent.description;
-    TextField descriptionWidget = TextField(
-      keyboardType: TextInputType.multiline,
-      decoration: InputDecoration(
-          border: InputBorder.none, hintText: "Enter description"),
-      style: Theme.of(context).textTheme.body1,
+    var expansionList = ExpansionPanelList(
+      expansionCallback: _doExpansion,
+      children: childPanels,
+    );
+    return SingleChildScrollView(
+        child: Container(
+      child: expansionList,
+    ));
+  }
+
+  bool _isExpanded(final int index) {
+    if (_expansionStateList.length - 1 < index) {
+      _expansionStateList.add(false);
+    }
+    return _expansionStateList[index];
+  }
+
+  void _doExpansion(final int index, final bool isExpanded) {
+    setState(() {
+      _expansionStateList[index] = !isExpanded;
+      _buildHeader(context, isExpanded, workEvents[index]);
+    });
+  }
+
+  Widget _buildBody(final BuildContext context, final WorkEvent workEvent) {
+    final descriptionEditor = TextField(
+      decoration: InputDecoration(hintText: "Enter description"),
+      controller: TextEditingController(text: workEvent.description),
       maxLines: null,
-      onChanged: (newDesc) => workEvent.description = newDesc,
-      controller: descriptionController,
+      style: Theme.of(context).textTheme.body1,
+      onChanged: (change) => workEvent.description = change,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: nameWidget,
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: descriptionWidget,
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text("Skill"),
-        onPressed: () => print("HEY"),
-        icon: Icon(Icons.add),
+    final tagEditors = <Widget>[];
+    workEvent.workSkills.forEach((tag) => tagEditors.add(TagWidget(tag)));
+    final tagEditorRow = Row(children: tagEditors);
+
+    return Container(
+      child: Column(
+        children: <Widget>[descriptionEditor, tagEditorRow],
       ),
     );
+  }
+
+  Widget _buildHeader(final BuildContext context, final bool isExpanded,
+      final WorkEvent workEvent) {
+    Icon eventTypeIcon;
+
+    switch (workEvent.eventType) {
+      case WorkEventType.accomplishment:
+        eventTypeIcon = Icon(
+          Icons.star,
+          color: Theme.of(context).accentColor,
+        );
+        break;
+      case WorkEventType.journalEntry:
+      default:
+        eventTypeIcon = Icon(Icons.bookmark);
+    }
+
+    Widget nameWidget = TextField(
+      decoration: InputDecoration(
+          prefixIcon: eventTypeIcon,
+          hintText: "Enter name",
+          suffixText: DateFormat.yMd().format(workEvent.entryDate),
+          border: InputBorder.none),
+      controller: TextEditingController(text: workEvent.name),
+      style: Theme.of(context).textTheme.body1,
+      onChanged: (change) => workEvent.name = change,
+    );
+
+    return nameWidget;
   }
 }
 
 class WorkEventScreen extends StatefulWidget {
-  final WorkEvent workEvent;
+  final List<WorkEvent> workEvent;
 
   const WorkEventScreen(this.workEvent, {Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() =>
-      WorkEventScreenState(workEvent: this.workEvent);
+      WorkEventScreenState(workEvents: this.workEvent);
 }

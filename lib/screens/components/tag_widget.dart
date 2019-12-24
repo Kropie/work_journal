@@ -8,8 +8,24 @@ class TagWidgetState extends State<TagWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return null;
+    final editorController = TextEditingController(text: this.tag.name);
+    final editor = TextField(
+      // decoration: InputDecoration(
+      //     border: OutlineInputBorder(
+      //         borderRadius: BorderRadius.all(const Radius.circular(10.0)))),
+      // style: Theme.of(context).textTheme.body1.copyWith(color: Colors.yellow),
+      // maxLength: 3,
+      controller: editorController,
+    );
+
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: editor,
+        ),
+        Expanded(child: Icon(Icons.cancel))
+      ],
+    );
   }
 }
 
