@@ -1,6 +1,6 @@
 import 'package:work_journal/models/removable.dart';
 
-class Tag<T extends TaggedRemovable> extends Removable {
+class Tag<T extends Tagged> extends Removable {
   T parent;
   String name;
   Tag(this.parent, {this.name = ""});
