@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:work_journal/models/tag.dart';
 import 'package:work_journal/models/work_event.dart';
 
-class TagListWidgetState extends State<TagListWidget> {
+class _TagListWidgetState extends State<TagListWidget> {
   final List<Tag> tagList;
   final WorkEvent parentEvent;
 
-  TagListWidgetState(this.tagList, this.parentEvent);
+  _TagListWidgetState(this.tagList, this.parentEvent);
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +55,13 @@ class TagListWidgetState extends State<TagListWidget> {
       );
     }));
 
-    return Wrap(
-      alignment: WrapAlignment.start,
-      spacing: 5.0,
-      children: tagWidgets,
-    );
+    return Align(
+        alignment: Alignment.topLeft,
+        child: Wrap(
+          alignment: WrapAlignment.start,
+          spacing: 5.0,
+          children: tagWidgets,
+        ));
   }
 
   void _editTag(BuildContext context, Tag tag) {
@@ -98,5 +100,5 @@ class TagListWidget extends StatefulWidget {
   TagListWidget(this.tagList, this.parentEvent, {Key key}) : super(key: key);
 
   @override
-  State createState() => TagListWidgetState(tagList, parentEvent);
+  State createState() => _TagListWidgetState(tagList, parentEvent);
 }

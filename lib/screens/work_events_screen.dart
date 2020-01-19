@@ -1,69 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:work_journal/models/filter.dart';
 import 'package:work_journal/models/work_event.dart';
 import 'package:work_journal/screens/components/tag_list_widget.dart';
+import 'package:collection/collection.dart';
 
-class WorkEventScreenState extends State<WorkEventScreen> {
+class _WorkEventScreenState extends State<WorkEventScreen> {
   static const _padding = 16.0;
-  final List<WorkEvent> workEvents;
-  List<bool> _expansionStateList;
-  List<WorkEvent> _favoriteWorkEvents;
-  final bool Function(WorkEvent event) filter;
+  final List<WorkEvent> _workEvents;
+  List<WorkEvent> _previousEvents;
+  final Filter<WorkEvent> _filter;
+  var count = 0;
+  Key key;
 
-  WorkEventScreenState(this.workEvents, this.filter) {
-    if (workEvents.isEmpty) {
-      _expansionStateList = [false];
-    } else {
-      _expansionStateList = workEvents.map((event) => false).toList();
-    }
-
-    _favoriteWorkEvents = [];
-    for (var value in workEvents) {
-      if (value.isFavorite) _favoriteWorkEvents.add(value);
-    }
+  _WorkEventScreenState(this._workEvents, this._filter) {
+    _previousEvents = List.of(_workEvents);
+    key = Key("$count");
   }
 
   @override
   Widget build(BuildContext context) {
     List<ExpansionPanel> childPanels = [];
-    for (var i = 0; i < workEvents.length; i++) {
-      if (filter(workEvents[i])) {
+    for (var i = 0; i < _workEvents.length; i++) {
+      if (_filter.test(_workEvents[i])) {
         childPanels.add(ExpansionPanel(
             headerBuilder: (BuildContext context, bool isExpanded) =>
-                _buildHeader(context, _isExpanded(i), workEvents[i]),
-            body: _buildBody(context, workEvents[i]),
-            isExpanded: _isExpanded(i)));
+                _buildHeader(
+                    context, _isExpanded(_workEvents[i]), _workEvents[i]),
+            body: _buildBody(context, _workEvents[i], i),
+            isExpanded: _isExpanded(_workEvents[i])));
       }
     }
 
+    Function eq = ListEquality().equals;
+    if (_previousEvents.length != _workEvents.length) {
+      key = Key("${++count}");
+    }
+    _previousEvents = List.of(_workEvents);
+
     var expansionList = ExpansionPanelList(
+      key: key,
       expansionCallback: _doExpansion,
       children: childPanels,
     );
+
     return SingleChildScrollView(
         child: Container(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 100.0),
-            child: expansionList,
-          ),
-        ));
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 100.0),
+        child: expansionList,
+      ),
+    ));
   }
 
-  bool _isExpanded(final int index) {
-    if (_expansionStateList.length - 1 < index) {
-      _expansionStateList.add(false);
+  bool _isExpanded(final WorkEvent event) {
+    if (event == null) {
+      return false;
+    } else {
+      return event.isExpanded;
     }
-    return _expansionStateList[index];
   }
 
   void _doExpansion(final int index, final bool isExpanded) {
     setState(() {
-      _expansionStateList[index] = !isExpanded;
-      _buildHeader(context, isExpanded, workEvents[index]);
+      _workEvents[index].isExpanded = !isExpanded;
     });
   }
 
-  Widget _buildBody(final BuildContext context, final WorkEvent workEvent) {
+  Widget _buildBody(
+      final BuildContext context, final WorkEvent workEvent, int index) {
     return Container(
       padding: EdgeInsets.all(_padding),
       child: Column(
@@ -73,16 +78,49 @@ class WorkEventScreenState extends State<WorkEventScreen> {
             controller: TextEditingController(text: workEvent.description),
             maxLines: null,
             keyboardType: TextInputType.text,
-            style: Theme
-                .of(context)
-                .textTheme
-                .body1,
+            style: Theme.of(context).textTheme.body1,
             onChanged: (change) => workEvent.description = change,
           ),
-          TagListWidget(workEvent.workSkills, workEvent)
+          TagListWidget(workEvent.workSkills, workEvent),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => deleteWorkEvent(context, index, workEvent)),
+          )
         ],
       ),
     );
+  }
+
+  void deleteWorkEvent(BuildContext context, int index, WorkEvent workEvent) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          SimpleDialog dialog;
+          dialog = SimpleDialog(
+            title: Text("Delete this event?"),
+            children: <Widget>[
+              ButtonBar(children: [
+                RaisedButton(
+                  child: Text("Yes"),
+                  onPressed: () {
+                    Navigator.pop(context, dialog);
+                    setState(() {
+                      _workEvents.remove(workEvent);
+                    });
+                  },
+                ),
+                FlatButton(
+                  child: Text("No"),
+                  onPressed: () => Navigator.pop(context, dialog),
+                )
+              ])
+            ],
+          );
+
+          return dialog;
+        });
   }
 
   Widget _buildHeader(final BuildContext context, final bool isExpanded,
@@ -90,37 +128,27 @@ class WorkEventScreenState extends State<WorkEventScreen> {
     IconButton eventTypeIcon;
     IconData iconData;
 
-    if (_favoriteWorkEvents.contains(workEvent)) {
+    if (workEvent.isFavorite) {
       iconData = Icons.favorite;
     } else {
       iconData = Icons.favorite_border;
     }
 
-    
-
     eventTypeIcon = IconButton(
       icon: Icon(iconData),
-      color: Theme
-          .of(context)
-          .accentColor,
+      color: Theme.of(context).accentColor,
       onPressed: () {
         setState(() {
-          if (!_favoriteWorkEvents.remove(workEvent)) {
-            _favoriteWorkEvents.add(workEvent);
-            workEvent.isFavorite = true;
-          }
+          workEvent.isFavorite = !workEvent.isFavorite;
         });
       },
     );
 
     Widget nameWidget = TextField(
       decoration:
-      InputDecoration(hintText: "Enter name", border: InputBorder.none),
+          InputDecoration(hintText: "Enter name", border: InputBorder.none),
       controller: TextEditingController(text: workEvent.name),
-      style: Theme
-          .of(context)
-          .textTheme
-          .body1,
+      style: Theme.of(context).textTheme.body1,
       onChanged: (change) => workEvent.name = change,
     );
 
@@ -134,10 +162,7 @@ class WorkEventScreenState extends State<WorkEventScreen> {
           onTap: () => _updateDate(context, workEvent),
           child: Text(
             DateFormat.yMd().format(workEvent.entryDate),
-            style: Theme
-                .of(context)
-                .textTheme
-                .caption,
+            style: Theme.of(context).textTheme.caption,
           ),
         )
       ],
@@ -151,8 +176,7 @@ class WorkEventScreenState extends State<WorkEventScreen> {
         firstDate: DateTime(1900),
         lastDate: DateTime.now());
 
-    selectedDate.then((newDate) =>
-        setState(() {
+    selectedDate.then((newDate) => setState(() {
           if (newDate != null) {
             event.entryDate = newDate;
           }
@@ -161,13 +185,14 @@ class WorkEventScreenState extends State<WorkEventScreen> {
 }
 
 class WorkEventScreen extends StatefulWidget {
-  final List<WorkEvent> workEvent;
-  final bool Function(WorkEvent event) filter;
+  final List<WorkEvent> _workEvent;
+  final Filter<WorkEvent> _filter;
 
-  const WorkEventScreen(this.workEvent, this.filter, {Key key})
+  const WorkEventScreen(this._workEvent, this._filter, {Key key})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() =>
-      WorkEventScreenState(this.workEvent, this.filter);
+  State<StatefulWidget> createState() {
+    return _WorkEventScreenState(this._workEvent, this._filter);
+  }
 }

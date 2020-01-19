@@ -17,6 +17,18 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.redAccent,
           cardColor: Color.fromARGB(255, 25, 25, 25),
           fontFamily: 'Georgia',
+          floatingActionButtonTheme: FloatingActionButtonThemeData(
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.redAccent,
+          ),
+          dialogTheme: DialogTheme(
+            backgroundColor: Color.fromARGB(255, 25, 25, 25),
+            contentTextStyle: TextStyle(
+                fontSize: 12.0,
+                fontStyle: FontStyle.italic,
+                color: Colors.white),
+          ),
+          buttonColor: Colors.redAccent,
           textTheme: TextTheme(
             headline: TextStyle(
                 fontFamily: 'Playfair', fontSize: 36.0, color: Colors.white),
