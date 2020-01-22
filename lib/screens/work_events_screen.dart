@@ -3,40 +3,37 @@ import 'package:intl/intl.dart';
 import 'package:work_journal/models/filter.dart';
 import 'package:work_journal/models/work_event.dart';
 import 'package:work_journal/screens/components/tag_list_widget.dart';
-import 'package:collection/collection.dart';
 
 class _WorkEventScreenState extends State<WorkEventScreen> {
   static const _padding = 16.0;
-  final List<WorkEvent> _workEvents;
-  List<WorkEvent> _previousEvents;
+  int _previousLength = 0;
   final Filter<WorkEvent> _filter;
+  final WorkEventDB db = WorkEventDB.instance;
   var count = 0;
   Key key;
 
-  _WorkEventScreenState(this._workEvents, this._filter) {
-    _previousEvents = List.of(_workEvents);
+  _WorkEventScreenState(this._filter) {
     key = Key("$count");
   }
 
   @override
   Widget build(BuildContext context) {
     List<ExpansionPanel> childPanels = [];
-    for (var i = 0; i < _workEvents.length; i++) {
-      if (_filter.test(_workEvents[i])) {
+    for (var i = 0; i < WorkEventDB.instance.length; i++) {
+      if (_filter.test(WorkEventDB.instance.getEvent(i))) {
         childPanels.add(ExpansionPanel(
             headerBuilder: (BuildContext context, bool isExpanded) =>
                 _buildHeader(
-                    context, _isExpanded(_workEvents[i]), _workEvents[i]),
-            body: _buildBody(context, _workEvents[i], i),
-            isExpanded: _isExpanded(_workEvents[i])));
+                    context, _isExpanded(db.getEvent(i)), db.getEvent(i)),
+            body: _buildBody(context, db.getEvent(i), i),
+            isExpanded: _isExpanded(db.getEvent(i))));
       }
     }
 
-    Function eq = ListEquality().equals;
-    if (_previousEvents.length != _workEvents.length) {
+    if (_previousLength != db.length) {
       key = Key("${++count}");
     }
-    _previousEvents = List.of(_workEvents);
+    _previousLength = db.length;
 
     var expansionList = ExpansionPanelList(
       key: key,
@@ -57,13 +54,13 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
     if (event == null) {
       return false;
     } else {
-      return event.isExpanded;
+      return event.expanded;
     }
   }
 
-  void _doExpansion(final int index, final bool isExpanded) {
+  void _doExpansion(final int index, final bool expanded) {
     setState(() {
-      _workEvents[index].isExpanded = !isExpanded;
+      db.getEvent(index).expanded = !expanded;
     });
   }
 
@@ -107,7 +104,7 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
                   onPressed: () {
                     Navigator.pop(context, dialog);
                     setState(() {
-                      _workEvents.remove(workEvent);
+                      db.removeEvent(workEvent);
                     });
                   },
                 ),
@@ -128,7 +125,7 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
     IconButton eventTypeIcon;
     IconData iconData;
 
-    if (workEvent.isFavorite) {
+    if (workEvent.favorite) {
       iconData = Icons.favorite;
     } else {
       iconData = Icons.favorite_border;
@@ -139,7 +136,7 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
       color: Theme.of(context).accentColor,
       onPressed: () {
         setState(() {
-          workEvent.isFavorite = !workEvent.isFavorite;
+          workEvent.favorite = !workEvent.favorite;
         });
       },
     );
@@ -185,14 +182,13 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
 }
 
 class WorkEventScreen extends StatefulWidget {
-  final List<WorkEvent> _workEvent;
   final Filter<WorkEvent> _filter;
 
-  const WorkEventScreen(this._workEvent, this._filter, {Key key})
+  const WorkEventScreen(this._filter, {Key key})
       : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _WorkEventScreenState(this._workEvent, this._filter);
+    return _WorkEventScreenState(this._filter);
   }
 }

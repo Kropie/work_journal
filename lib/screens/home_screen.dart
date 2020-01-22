@@ -4,7 +4,6 @@ import 'package:work_journal/models/work_event.dart';
 import 'package:work_journal/screens/work_events_screen.dart';
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _events = <WorkEvent>[];
   static const _title = "Work Journal";
   bool showFavorites = false;
   Filter<WorkEvent> _filter;
@@ -15,16 +14,15 @@ class _HomeScreenState extends State<HomeScreen> {
   _HomeScreenState() {
     _allFilter = new Filter((WorkEvent e) => true);
     _favoritesFilter =
-        new Filter((WorkEvent e) => e.isFavorite, name: "Favorite");
+        new Filter((WorkEvent e) => e.favorite, name: "Favorite");
 
     _filter = new Filter(_allFilter.filter);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<WorkEvent> displayedEvents = _events;
     final WorkEventScreen workEventScreen =
-        WorkEventScreen(displayedEvents, _filter);
+        WorkEventScreen(_filter);
 
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
@@ -32,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           centerTitle: true,
           leading: Icon(
-            Icons.work,
+            Icons.menu,
             color: Colors.white,
           ),
           title: Text(
@@ -124,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _addEvent(BuildContext context) {
     setState(() {
-      _events.add(WorkEvent("", WorkEventType.accomplishment, DateTime.now()));
+      WorkEventDB.instance.addEvent(WorkEvent("", DateTime.now()));
     });
   }
 }
