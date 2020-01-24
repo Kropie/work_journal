@@ -7,6 +7,7 @@ import 'package:work_journal/screens/components/tag_list_widget.dart';
 class _WorkEventScreenState extends State<WorkEventScreen> {
   static const _padding = 16.0;
   int _previousLength = 0;
+  String _previousFilterName = "";
   final Filter<WorkEvent> _filter;
   final WorkEventDB db = WorkEventDB.instance;
   var count = 0;
@@ -30,10 +31,11 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
       }
     }
 
-    if (_previousLength != db.length) {
-      key = Key("${++count}");
+    if (_previousLength != db.length || _previousFilterName != _filter.name) {
+      key = Key("${this.runtimeType}_${_filter.name}_${++count}");
     }
     _previousLength = db.length;
+    _previousFilterName = _filter.name;
 
     var expansionList = ExpansionPanelList(
       key: key,
@@ -184,8 +186,7 @@ class _WorkEventScreenState extends State<WorkEventScreen> {
 class WorkEventScreen extends StatefulWidget {
   final Filter<WorkEvent> _filter;
 
-  const WorkEventScreen(this._filter, {Key key})
-      : super(key: key);
+  const WorkEventScreen(this._filter, {Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

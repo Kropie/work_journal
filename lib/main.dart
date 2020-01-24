@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
           primaryColor: Colors.red,
           accentColor: Colors.redAccent,
           cardColor: Color.fromARGB(255, 25, 25, 25),
+          canvasColor: Color.fromARGB(255, 25, 25, 25),
           fontFamily: 'Georgia',
           floatingActionButtonTheme: FloatingActionButtonThemeData(
             foregroundColor: Colors.white,

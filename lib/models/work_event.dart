@@ -1,10 +1,9 @@
-import 'package:work_journal/models/removable.dart';
-import 'package:work_journal/models/tag.dart';
+import 'package:work_journal/models/skill.dart';
 
-class WorkEvent extends Tagged {
+class WorkEvent {
   String name;
   String description;
-  List<Tag<WorkEvent>> workSkills = [];
+  List<Skill> workSkills = [];
   DateTime entryDate;
   bool favorite;
   bool expanded;
@@ -12,8 +11,8 @@ class WorkEvent extends Tagged {
   WorkEvent(this.name, this.entryDate,
       {this.description = '', this.favorite = false, this.expanded = false});
 
-  @override
-  void remove(Tag tag) {
+  void remove(Skill tag) {
+    SkillsDB.instance.removeSkill(tag);
     workSkills.remove(tag);
   }
 
@@ -41,11 +40,9 @@ class WorkEvent extends Tagged {
 
 class WorkEventDB {
   static WorkEventDB _instance;
-  List<WorkEvent> workEvents;
+  final List<WorkEvent> workEvents = <WorkEvent>[];
 
-  WorkEventDB._internal() {
-    workEvents = <WorkEvent>[];
-  }
+  WorkEventDB._internal();
 
   static WorkEventDB get instance {
     if (_instance == null) {
@@ -55,27 +52,22 @@ class WorkEventDB {
     return _instance;
   }
 
-  void addEvent(WorkEvent toAdd) {
-    workEvents.add(toAdd);
-  }
+  void addEvent(WorkEvent event) => workEvents.add(event);
 
   void updateEvent(WorkEvent event, int index) {
     // This will be necessary when actually connected to a database.
   }
 
-  void removeEvent(WorkEvent toRemove) {
-    workEvents.remove(toRemove);
+  void removeEvent(WorkEvent event) {
+    workEvents.remove(event);
+    for (Skill skill in event.workSkills) {
+      SkillsDB.instance.removeSkill(skill);
+    }
   }
 
-  WorkEvent getEvent(int index) {
-    return workEvents[index];
-  }
+  WorkEvent getEvent(int index) => workEvents[index];
 
-  int get length {
-    return workEvents.length;
-  }
+  int get length => workEvents.length;
 
-  List<WorkEvent> getCopyOfEvents() {
-    return List.of(workEvents);
-  }
+  List<WorkEvent> getCopy() => List.of(workEvents);
 }

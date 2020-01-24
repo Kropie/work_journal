@@ -21,18 +21,61 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final WorkEventScreen workEventScreen =
-        WorkEventScreen(_filter);
+    final WorkEventScreen workEventScreen = WorkEventScreen(_filter);
 
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        // Abb bar start.
+        drawer: Drawer(
+            child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    child: Text("JK"),
+                    backgroundColor: Theme.of(context).textTheme.body1.color,
+                    foregroundColor: Theme.of(context).primaryColor,
+                  ),
+                  Text("TODO - Show user info")
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: ListTile(
+                leading: Icon(
+                  Icons.work,
+                  color: Theme.of(context).accentColor,
+                ),
+                title: Text(
+                  "Accomplishments",
+                  style: Theme.of(context).textTheme.body1,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: ListTile(
+                leading: Icon(
+                  Icons.build,
+                  color: Theme.of(context).accentColor,
+                ),
+                title: Text(
+                  "Skills",
+                  style: Theme.of(context).textTheme.body1,
+                ),
+              ),
+            )
+          ],
+        )),
         appBar: AppBar(
           centerTitle: true,
-          leading: Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
           title: Text(
             _title,
             style: Theme.of(context).textTheme.headline,

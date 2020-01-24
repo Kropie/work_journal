@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:work_journal/models/tag.dart';
+import 'package:work_journal/models/skill.dart';
 import 'package:work_journal/models/work_event.dart';
+import 'package:work_journal/screens/components/add_skill.dart';
 
 class _TagListWidgetState extends State<TagListWidget> {
-  final List<Tag> tagList;
+  final List<Skill> tagList;
   final WorkEvent parentEvent;
 
   _TagListWidgetState(this.tagList, this.parentEvent);
@@ -32,11 +33,9 @@ class _TagListWidgetState extends State<TagListWidget> {
             child: Icon(Icons.add),
           ),
         ),
-        onTap: () => setState(() {
-          Tag newTag = Tag(parentEvent);
-          tagList.add(newTag);
-          _editTag(context, newTag);
-        }),
+        onTap: () =>
+            showDialog(context: context, child: AddSkillDialog(parentEvent))
+                .then((value) => setState(() {})),
       )
     ];
 
@@ -64,7 +63,7 @@ class _TagListWidgetState extends State<TagListWidget> {
         ));
   }
 
-  void _editTag(BuildContext context, Tag tag) {
+  void _editTag(BuildContext context, Skill tag) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -94,7 +93,7 @@ class _TagListWidgetState extends State<TagListWidget> {
 }
 
 class TagListWidget extends StatefulWidget {
-  final List<Tag> tagList;
+  final List<Skill> tagList;
   final WorkEvent parentEvent;
 
   TagListWidget(this.tagList, this.parentEvent, {Key key}) : super(key: key);
