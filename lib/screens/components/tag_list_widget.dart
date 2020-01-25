@@ -40,17 +40,14 @@ class _TagListWidgetState extends State<TagListWidget> {
     ];
 
     tagWidgets.addAll(tagList.map((tag) {
-      return GestureDetector(
-        onTap: () => _editTag(context, tag),
-        child: Chip(
-          backgroundColor: Theme.of(context).accentColor,
-          label: Text(tag.name),
-          onDeleted: () {
-            setState(() {
-              tag.remove();
-            });
-          },
-        ),
+      return Chip(
+        backgroundColor: Theme.of(context).accentColor,
+        label: Text(tag.name),
+        onDeleted: () {
+          setState(() {
+            tag.remove();
+          });
+        },
       );
     }));
 
@@ -61,34 +58,6 @@ class _TagListWidgetState extends State<TagListWidget> {
           spacing: 5.0,
           children: tagWidgets,
         ));
-  }
-
-  void _editTag(BuildContext context, Skill tag) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          SimpleDialog dialog;
-          dialog = SimpleDialog(
-            backgroundColor: Theme.of(context).cardColor,
-            title: Text("Edit skill"),
-            children: <Widget>[
-              Container(
-                  padding: EdgeInsets.all(10.0),
-                  child: TextField(
-                    autofocus: true,
-                    controller: TextEditingController(text: tag.name),
-                    onChanged: (newValue) {
-                      setState(() {
-                        tag.name = newValue;
-                      });
-                    },
-                    onSubmitted: (change) => Navigator.pop(context, dialog),
-                  )),
-            ],
-          );
-
-          return dialog;
-        });
   }
 }
 

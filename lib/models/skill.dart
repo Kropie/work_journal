@@ -55,19 +55,8 @@ class SkillsDB {
   }
 
   void _evaluateName(Skill skill, String newName, String oldName) {
-    if (skillsMap.containsKey(oldName)) {
-      List<Skill> skills = skillsMap[oldName];
-      if (skills != null) {
-        skills.remove(skill);
-
-        if (skills.isEmpty) {
-          skillsMap.remove(oldName);
-        }
-      }
-    }
-
-    skillsMap.putIfAbsent(newName, () => <Skill>[]);
-    skillsMap[newName].add(skill);
+    removeSkill(Skill.workingCopy(oldName));
+    addSkill(skill);
   }
 
   void addSkill(Skill skill) {
