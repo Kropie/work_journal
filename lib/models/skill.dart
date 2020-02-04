@@ -77,14 +77,14 @@ class SkillsDB {
   }
 
   ///
-  /// Gets a working copy of the skills that are currently available, avoiding
+  /// Gets a list of skills that are currently available, avoiding
   /// any names provided in the [excludedNames] list, if provided.
   ///
   List<Skill> getWorkingCopy({List<String> excludedNames}) {
     List<Skill> copy = <Skill>[];
 
     for (String name in skillsMap.keys) {
-      if (excludedNames != null && !excludedNames.contains(name)) {
+      if (excludedNames == null || !excludedNames.contains(name)) {
         copy.add(Skill.workingCopy(name));
       }
     }

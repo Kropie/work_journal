@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:work_journal/models/filter.dart';
 import 'package:work_journal/models/work_event.dart';
+import 'package:work_journal/screens/scaffold_creator.dart';
 import 'package:work_journal/screens/work_events_screen.dart';
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -21,83 +22,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final WorkEventScreen workEventScreen = WorkEventScreen(_filter);
-
-    return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
-        drawer: Drawer(
-            child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    child: Text("JK"),
-                    backgroundColor: Theme.of(context).textTheme.body1.color,
-                    foregroundColor: Theme.of(context).primaryColor,
-                  ),
-                  Text("TODO - Show user info")
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: ListTile(
-                leading: Icon(
-                  Icons.work,
-                  color: Theme.of(context).accentColor,
-                ),
-                title: Text(
-                  "Accomplishments",
-                  style: Theme.of(context).textTheme.body1,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: ListTile(
-                leading: Icon(
-                  Icons.build,
-                  color: Theme.of(context).accentColor,
-                ),
-                title: Text(
-                  "Skills",
-                  style: Theme.of(context).textTheme.body1,
-                ),
-              ),
-            )
-          ],
-        )),
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            _title,
-            style: Theme.of(context).textTheme.headline,
-          ),
-        ),
-        body: workEventScreen,
-        floatingActionButton: Container(
-            padding: EdgeInsets.only(left: 30),
-            child: Stack(
-              children: <Widget>[
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: _buildFilterFAB(context)),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: FloatingActionButton(
-                    onPressed: () => _addEvent(context),
-                    child: Icon(Icons.add),
-                  ),
-                )
-              ],
-            )));
+    return ScaffoldCreator.create(
+        context,
+        "Work Journal",
+        WorkEventScreen(_filter),
+        _buildFilterFAB(context),
+        FloatingActionButton(
+          heroTag: "Create event",
+          onPressed: () => _addEvent(context),
+          child: Icon(Icons.add),
+        ));
   }
 
   FloatingActionButton _buildFilterFAB(BuildContext context) {
@@ -110,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   FloatingActionButton _buildFilterStandardFAB(BuildContext context) {
     return FloatingActionButton(
+      heroTag: "Filter events",
       mini: true,
       onPressed: () => {},
       child: PopupMenuButton<Filter<WorkEvent>>(
@@ -137,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var textMenu = _buildFilterMenu(context, Text(_filter.name));
 
     return FloatingActionButton.extended(
+      heroTag: "Filter events",
       label: textMenu,
       onPressed: () => {},
       icon: iconMenu,
